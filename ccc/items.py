@@ -9,6 +9,13 @@ import scrapy
 
 
 class CccItem(scrapy.Item):
-    # define the fields for your item here like:
-    # name = scrapy.Field()
-    pass
+    indeks = scrapy.Field()
+    zdjecia = scrapy.Field()
+    nazwa = scrapy.Field()
+    wyswietlany = scrapy.Field() #stale na 1
+    kategoria = scrapy.Field()
+    cena = scrapy.Field()
+    ilosc = scrapy.Field()
+    marka = scrapy.Field()
+    opis_marki = scrapy.Field() #opdmienić przecinki na inny znak
+    cechy = scrapy.Field() # nazwa:wartości;nazwa:wartosci;
