@@ -45,19 +45,51 @@ class ObowieSpider(CrawlSpider):
             kategoria = 'k-' + kategoria.title()
         return(kategoria)
 
+    # def parse_detail_page(self, response):
+    #     item = CccItem()
+    #     cenaT = response.css('.c-offerBox_col').css('.a-price span::text').extract()
+    #     zdjeciaT = response.xpath('//div[@data-component="magnifier"]/img/@data-src').extract()
+    #     zdjeciaT = ['https://ccc.eu{0}'.format(zdjecie) for zdjecie in zdjeciaT]
+    #     item['zdjecia'] = ';'.join(zdjeciaT)
+    #     item['nazwa'] = response.css('.c-offerBox_data > .a-typo::text').extract()[0].strip()
+    #     item['kategoria'] = self.parse_category(response.url)
+    #     item['cena'] = cenaT[0] + '.' + cenaT[1]
+    #     item['ilosc'] = str(random.randint(100,200))
+    #     item['marka'] = response.xpath('//table[@class="c-table is-specification"]/tbody/tr/td/span/text()').extract()[3].strip()
+    #     item['opis_marki'] = '...'
+    #     yield item
+
     def parse_detail_page(self, response):
         item = CccItem()
-        cenaT = response.css('.c-offerBox_col').css('.a-price span::text').extract()
+        cenaT = response.css(".c-offerBox_col").css(".a-price span::text").extract()
         zdjeciaT = response.xpath('//div[@data-component="magnifier"]/img/@data-src').extract()
-        zdjeciaT = ['https://ccc.eu{0}'.format(zdjecie) for zdjecie in zdjeciaT]
-        item['zdjecia'] = ';'.join(zdjeciaT)
+        zdjeciaT = ["https://ccc.eu{0}".format(zdjecie) for zdjecie in zdjeciaT]
+        item["zdjecia"] = ';'.join(zdjeciaT)
         item['nazwa'] = response.css('.c-offerBox_data > .a-typo::text').extract()[0].strip()
         item['kategoria'] = self.parse_category(response.url)
         item['cena'] = cenaT[0] + '.' + cenaT[1]
-        item['ilosc'] = str(random.randint(100,200))
-        item['marka'] = response.xpath('//table[@class="c-table is-specification"]/tbody/tr/td/span/text()').extract()[3].strip()
-        item['opis_marki'] = '...'
+        item['ilosc'] = random.randint(10, 100)
+        item['wyswietlany'] = 1
+        item['marka'] = response.xpath('//table[@class="c-table is-specification"]/tbody/tr/td/span/text()').extract()[1].strip()
+        item['opis_marki'] = ''
+        cechyTrResponses = response.css('.c-table.is-specification').css('tr')
+        cechyT = []
+        for tr in cechyTrResponses:
+            first = tr.css('span::text').extract_first().strip()
+            second = tr.css('span::text').extract()
+            second.pop(0)
+            second = [s.strip() for s in second]
+            second = [s.replace(',', '.') for s in second]
+            second = ','.join(second)
+            cechyT += [(first + ':' + second)]
+            if first == "Kod produktu":
+                item['indeks'] = second
+        #cechy = ';'.join(cechyT)
+        item['cechy'] = ';'.join(cechyT)
+        #item['indeks'] = #response.css('.c-table.is-specification').css('tr').css('td').css('span::text').extract()[5].strip()
+        #print(cechy)
         yield item
+        #pass
 
     def parse_item(self, response):
         #item_links = response.css('.c-layout_col > .c-offerBox_photo a::attr(href)').extract()

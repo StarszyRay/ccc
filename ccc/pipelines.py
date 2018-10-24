@@ -10,7 +10,7 @@ class CccPipeline(object):
 
     def open_spider(self, spider):
         self.csvwriter = csv.writer(open('marki.csv', 'a'))
-        self.csvwriter.writerow({'nazwa_marki', 'opis_marki'})
+        self.csvwriter.writerow({'marka', 'opis_marki'})
         self.ids_seen = set()
         self.markiT = []
 
@@ -20,7 +20,7 @@ class CccPipeline(object):
         pass
 
     def process_item(self, item, spider):
-        self.markiT += (item['nazwa_marki'], item['opis_marki'])
+        self.markiT += (item['marka'], item['opis_marki'])
         #self.csvwriter.writerow([item['nazwa_marki'],
         #                         item['opis_marki']])
         # self.csvwriter.writerow([item['ID'], item['zdjecia'],
