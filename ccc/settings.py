@@ -105,7 +105,9 @@ FIELDS_TO_EXPORT = [
     'cena',
     'ilosc',
     'marka',
-    'zdjecia'
+    'wyswietlany',
+    'zdjecia',
+    'cechy'
 ]
 
-CSV_DELIMITER = ","
+CSV_DELIMITER = "|"
