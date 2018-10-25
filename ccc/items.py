@@ -18,5 +18,6 @@ class CccItem(scrapy.Item):
     ilosc = scrapy.Field()
     marka = scrapy.Field()
     opis_marki = scrapy.Field() #opdmienić przecinki na inny znak
-    atrybuty = scrapy.Field() # nazwa:wartości;nazwa:wartosci;
+    zdjecie_marki = scrapy.Field()
+    cechy = scrapy.Field() # nazwa:wartości;nazwa:wartosci;
     rozmiary = scrapy.Field()

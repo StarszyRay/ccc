@@ -14,39 +14,39 @@ class ObowieSpider(CrawlSpider):
         #damskie
         "https://ccc.eu/pl/damskie/buty/botki",
         "https://ccc.eu/pl/damskie/buty/trzewiki",
-        "https://ccc.eu/pl/damskie/buty/kozaki",
-        "https://ccc.eu/pl/damskie/buty/czolenka",
-        "https://ccc.eu/pl/damskie/buty/polbuty",
-        "https://ccc.eu/pl/damskie/buty/sportowe",
-        "https://ccc.eu/pl/damskie/buty/trampki",
-        "https://ccc.eu/pl/damskie/buty/baleriny",
-        "https://ccc.eu/pl/damskie/buty/espadryle",
-        "https://ccc.eu/pl/damskie/buty/klapki-basenowe",
-        "https://ccc.eu/pl/damskie/buty/kapcie",
-        #meskie
-        "https://ccc.eu/pl/meskie/buty/botki",
-        "https://ccc.eu/pl/meskie/buty/trzewiki",
-        "https://ccc.eu/pl/meskie/buty/polbuty",
-        "https://ccc.eu/pl/meskie/buty/sportowe",
-        "https://ccc.eu/pl/meskie/buty/trampki",
-        "https://ccc.eu/pl/meskie/buty/klapki-basenowe",
-        #dziewczece
-        "https://ccc.eu/pl/dzieciece/dziewczece/botki",
-        "https://ccc.eu/pl/dzieciece/dziewczece/trzewiki",
-        "https://ccc.eu/pl/dzieciece/dziewczece/kozaki",
-        "https://ccc.eu/pl/dzieciece/dziewczece/kalosze",
-        "https://ccc.eu/pl/dzieciece/dziewczece/sportowe",
-        "https://ccc.eu/pl/dzieciece/dziewczece/trampki",
-        "https://ccc.eu/pl/dzieciece/dziewczece/polbuty",
-        "https://ccc.eu/pl/dzieciece/dziewczece/kapcie",
-        #chlopiece
-        "https://ccc.eu/pl/dzieciece/chlopiece/trzewiki",
-        "https://ccc.eu/pl/dzieciece/chlopiece/trzewiki",
-        "https://ccc.eu/pl/dzieciece/chlopiece/kalosze",
-        "https://ccc.eu/pl/dzieciece/chlopiece/sportowe",
-        "https://ccc.eu/pl/dzieciece/chlopiece/polbuty",
-        "https://ccc.eu/pl/dzieciece/chlopiece/trampki",
-        "https://ccc.eu/pl/dzieciece/chlopiece/kapcie"
+        "https://ccc.eu/pl/damskie/buty/kozaki"#,
+        # "https://ccc.eu/pl/damskie/buty/czolenka",
+        # "https://ccc.eu/pl/damskie/buty/polbuty",
+        # "https://ccc.eu/pl/damskie/buty/sportowe",
+        # "https://ccc.eu/pl/damskie/buty/trampki",
+        # "https://ccc.eu/pl/damskie/buty/baleriny",
+        # "https://ccc.eu/pl/damskie/buty/espadryle",
+        # "https://ccc.eu/pl/damskie/buty/klapki-basenowe",
+        # "https://ccc.eu/pl/damskie/buty/kapcie",
+        # #meskie
+        # "https://ccc.eu/pl/meskie/buty/botki",
+        # "https://ccc.eu/pl/meskie/buty/trzewiki",
+        # "https://ccc.eu/pl/meskie/buty/polbuty",
+        # "https://ccc.eu/pl/meskie/buty/sportowe",
+        # "https://ccc.eu/pl/meskie/buty/trampki",
+        # "https://ccc.eu/pl/meskie/buty/klapki-basenowe",
+        # #dziewczece
+        # "https://ccc.eu/pl/dzieciece/dziewczece/botki",
+        # "https://ccc.eu/pl/dzieciece/dziewczece/trzewiki",
+        # "https://ccc.eu/pl/dzieciece/dziewczece/kozaki",
+        # "https://ccc.eu/pl/dzieciece/dziewczece/kalosze",
+        # "https://ccc.eu/pl/dzieciece/dziewczece/sportowe",
+        # "https://ccc.eu/pl/dzieciece/dziewczece/trampki",
+        # "https://ccc.eu/pl/dzieciece/dziewczece/polbuty",
+        # "https://ccc.eu/pl/dzieciece/dziewczece/kapcie",
+        # #chlopiece
+        # "https://ccc.eu/pl/dzieciece/chlopiece/trzewiki",
+        # "https://ccc.eu/pl/dzieciece/chlopiece/trzewiki",
+        # "https://ccc.eu/pl/dzieciece/chlopiece/kalosze",
+        # "https://ccc.eu/pl/dzieciece/chlopiece/sportowe",
+        # "https://ccc.eu/pl/dzieciece/chlopiece/polbuty",
+        # "https://ccc.eu/pl/dzieciece/chlopiece/trampki",
+        # "https://ccc.eu/pl/dzieciece/chlopiece/kapcie"
     ]
 
     rules = (
@@ -83,8 +83,21 @@ class ObowieSpider(CrawlSpider):
         item['ilosc'] = random.randint(10, 100)
         item['wyswietlany'] = 1
         item['marka'] = response.xpath('//table[@class="c-table is-specification"]/tbody/tr/td/span/text()').extract()[1].strip()
-        item['opis_marki'] = response.xpath('//div[@class="widget text_editor clearfix2"]/p/text()').extract_first()
-<<<<<<< HEAD
+        # zdjecie_marki_path = response.xpath('//div[@class="widget image_widget"]/a/img[@alt="{0}"]/@src'.format(item['marka'])).extract()
+        # if zdjecie_marki_path == []:
+        #     item['zdjecie_marki'] = ''
+        #     item['opis_marki'] = ''
+        # else:
+        #     item['opis_marki'] = response.xpath('//div[@class="widget text_editor clearfix2"]/p/text()').extract_first()
+        #     item['zdjecie_marki'] = "https://ccc.eu{0}".format(zdjecie_marki_path)
+        if response.css('.c-grid_row.is-about').css('div > p::text').extract_first().strip() == 'O marce':
+            item['opis_marki'] = response.css('.c-grid_row.is-about').css('div > p::text').extract()[-1]
+            item['zdjecie_marki'] = "https://ccc.eu{0}".format(
+                response.css('div .c-content > div .widget.image_widget > a > img::attr(src)').extract()
+            )
+        else:
+            item['opis_marki'] = ''
+            item['zdjecie_marki'] = ''
         ilosc_rozmiarow = random.randint(2,5)
         rozmiaryT = [37,38,39,40,41,42]
         rozmiary = []
@@ -94,7 +107,6 @@ class ObowieSpider(CrawlSpider):
             rozmiary += [rozmiar]
         rozmiary = [str(r) for r in rozmiary]
         item['rozmiary'] = ','.join(rozmiary)
-=======
         cechyTrResponses = response.css('.c-table.is-specification').css('tr')
         cechyT = []
         for tr in cechyTrResponses:
@@ -111,7 +123,6 @@ class ObowieSpider(CrawlSpider):
         item['cechy'] = ';'.join(cechyT)
         #item['indeks'] = #response.css('.c-table.is-specification').css('tr').css('td').css('span::text').extract()[5].strip()
         #print(cechy)
->>>>>>> master
         yield item
         #pass
 

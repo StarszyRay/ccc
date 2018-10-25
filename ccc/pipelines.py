@@ -9,23 +9,19 @@ import csv
 class CccPipeline(object):
 
     def open_spider(self, spider):
-        self.csvwriter = csv.writer(open('marki.csv', 'a'))
-        self.csvwriter.writerow({'marka', 'opis_marki'})
+        self.csv_marki_writer = csv.writer(open('marki_{0}.csv'.format(spider.name), 'w'))
+        self.csv_marki_writer.writerow({'marka', 'opis_marki', 'zdjecie_marki'})
         self.ids_seen = set()
         self.markiT = []
 
     def close_spider(self, spider):
-        for element in set(self.markiT):
-            self.csvwriter.writerow([element[0], element[1]])
+        s = set()
+        for element in self.markiT:
+            s.add(element)
+            #self.csv_marki_writer.writerow([element[0], element[1], element[2]])
+        print(s)
         pass
 
     def process_item(self, item, spider):
-        self.markiT += (item['marka'], item['opis_marki'])
-        #self.csvwriter.writerow([item['nazwa_marki'],
-        #                         item['opis_marki']])
-        # self.csvwriter.writerow([item['ID'], item['zdjecia'],
-        #                          item['nazwa'], item['indeks'],
-        #                         item['kategoria'], item['cena'],
-        #                         item['ilosc'], item['wyswietlany'],
-        #                         item['pozycja']])
+        self.markiT += (item['marka'], item['opis_marki'], item['zdjecie_marki'])
         return item
