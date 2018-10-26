@@ -12,41 +12,41 @@ class ObowieSpider(CrawlSpider):
     allowed_domains = ["ccc.eu"]    #www.ccc.eu/pl
     start_urls = [
         #damskie
-        "https://ccc.eu/pl/damskie/buty/botki"#,
-        # "https://ccc.eu/pl/damskie/buty/trzewiki",
-        # "https://ccc.eu/pl/damskie/buty/kozaki",
-        # "https://ccc.eu/pl/damskie/buty/czolenka",
-        # "https://ccc.eu/pl/damskie/buty/polbuty",
-        # "https://ccc.eu/pl/damskie/buty/sportowe",
-        # "https://ccc.eu/pl/damskie/buty/trampki",
-        # "https://ccc.eu/pl/damskie/buty/baleriny",
-        # "https://ccc.eu/pl/damskie/buty/espadryle",
-        # "https://ccc.eu/pl/damskie/buty/klapki-basenowe",
-        # "https://ccc.eu/pl/damskie/buty/kapcie",
-        # #meskie
-        # "https://ccc.eu/pl/meskie/buty/botki",
-        # "https://ccc.eu/pl/meskie/buty/trzewiki",
-        # "https://ccc.eu/pl/meskie/buty/polbuty",
-        # "https://ccc.eu/pl/meskie/buty/sportowe",
-        # "https://ccc.eu/pl/meskie/buty/trampki",
-        # "https://ccc.eu/pl/meskie/buty/klapki-basenowe",
-        # #dziewczece
-        # "https://ccc.eu/pl/dzieciece/dziewczece/botki",
-        # "https://ccc.eu/pl/dzieciece/dziewczece/trzewiki",
-        # "https://ccc.eu/pl/dzieciece/dziewczece/kozaki",
-        # "https://ccc.eu/pl/dzieciece/dziewczece/kalosze",
-        # "https://ccc.eu/pl/dzieciece/dziewczece/sportowe",
-        # "https://ccc.eu/pl/dzieciece/dziewczece/trampki",
-        # "https://ccc.eu/pl/dzieciece/dziewczece/polbuty",
-        # "https://ccc.eu/pl/dzieciece/dziewczece/kapcie",
-        # #chlopiece
-        # "https://ccc.eu/pl/dzieciece/chlopiece/trzewiki",
-        # "https://ccc.eu/pl/dzieciece/chlopiece/trzewiki",
-        # "https://ccc.eu/pl/dzieciece/chlopiece/kalosze",
-        # "https://ccc.eu/pl/dzieciece/chlopiece/sportowe",
-        # "https://ccc.eu/pl/dzieciece/chlopiece/polbuty",
-        # "https://ccc.eu/pl/dzieciece/chlopiece/trampki",
-        # "https://ccc.eu/pl/dzieciece/chlopiece/kapcie"
+        "https://ccc.eu/pl/damskie/buty/botki",
+        "https://ccc.eu/pl/damskie/buty/trzewiki",
+        "https://ccc.eu/pl/damskie/buty/kozaki",
+        "https://ccc.eu/pl/damskie/buty/czolenka",
+        "https://ccc.eu/pl/damskie/buty/polbuty",
+        "https://ccc.eu/pl/damskie/buty/sportowe",
+        "https://ccc.eu/pl/damskie/buty/trampki",
+        "https://ccc.eu/pl/damskie/buty/baleriny",
+        "https://ccc.eu/pl/damskie/buty/espadryle",
+        "https://ccc.eu/pl/damskie/buty/klapki-basenowe",
+        "https://ccc.eu/pl/damskie/buty/kapcie",
+        #meskie
+        "https://ccc.eu/pl/meskie/buty/botki",
+        "https://ccc.eu/pl/meskie/buty/trzewiki",
+        "https://ccc.eu/pl/meskie/buty/polbuty",
+        "https://ccc.eu/pl/meskie/buty/sportowe",
+        "https://ccc.eu/pl/meskie/buty/trampki",
+        "https://ccc.eu/pl/meskie/buty/klapki-basenowe",
+        #dziewczece
+        "https://ccc.eu/pl/dzieciece/dziewczece/botki",
+        "https://ccc.eu/pl/dzieciece/dziewczece/trzewiki",
+        "https://ccc.eu/pl/dzieciece/dziewczece/kozaki",
+        "https://ccc.eu/pl/dzieciece/dziewczece/kalosze",
+        "https://ccc.eu/pl/dzieciece/dziewczece/sportowe",
+        "https://ccc.eu/pl/dzieciece/dziewczece/trampki",
+        "https://ccc.eu/pl/dzieciece/dziewczece/polbuty",
+        "https://ccc.eu/pl/dzieciece/dziewczece/kapcie",
+        #chlopiece
+        "https://ccc.eu/pl/dzieciece/chlopiece/trzewiki",
+        "https://ccc.eu/pl/dzieciece/chlopiece/trzewiki",
+        "https://ccc.eu/pl/dzieciece/chlopiece/kalosze",
+        "https://ccc.eu/pl/dzieciece/chlopiece/sportowe",
+        "https://ccc.eu/pl/dzieciece/chlopiece/polbuty",
+        "https://ccc.eu/pl/dzieciece/chlopiece/trampki",
+        "https://ccc.eu/pl/dzieciece/chlopiece/kapcie"
     ]
 
     rules = (
