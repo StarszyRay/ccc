@@ -12,3 +12,5 @@ class CccCsvItemExporter(CsvItemExporter):
         	kwargs['fields_to_export'] = fields_to_export
 
         super(CccCsvItemExporter, self).__init__(*args, **kwargs)
+
+        self.stream.newline = ""

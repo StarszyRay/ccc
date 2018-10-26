@@ -111,3 +111,5 @@ FIELDS_TO_EXPORT = [
 ]
 
 CSV_DELIMITER = "|"
+#Going to second page is depth = 2 going to items on that page is depth = 3 so our limit is:
+DEPTH_LIMIT = 3

@@ -12,9 +12,9 @@ class ObowieSpider(CrawlSpider):
     allowed_domains = ["ccc.eu"]    #www.ccc.eu/pl
     start_urls = [
         #damskie
-        "https://ccc.eu/pl/damskie/buty/botki",
-        "https://ccc.eu/pl/damskie/buty/trzewiki",
-        "https://ccc.eu/pl/damskie/buty/kozaki"#,
+        "https://ccc.eu/pl/damskie/buty/botki"#,
+        # "https://ccc.eu/pl/damskie/buty/trzewiki",
+        # "https://ccc.eu/pl/damskie/buty/kozaki",
         # "https://ccc.eu/pl/damskie/buty/czolenka",
         # "https://ccc.eu/pl/damskie/buty/polbuty",
         # "https://ccc.eu/pl/damskie/buty/sportowe",
@@ -52,7 +52,7 @@ class ObowieSpider(CrawlSpider):
     rules = (
         Rule(LinkExtractor(allow=(), restrict_css=(".is-next",)),
              callback="parse_item",
-             follow=False),)
+             follow=True),)
 
     def parse_category(self, url):
         urlT = url.split("/")
@@ -90,14 +90,16 @@ class ObowieSpider(CrawlSpider):
         # else:
         #     item['opis_marki'] = response.xpath('//div[@class="widget text_editor clearfix2"]/p/text()').extract_first()
         #     item['zdjecie_marki'] = "https://ccc.eu{0}".format(zdjecie_marki_path)
-        if response.css('.c-grid_row.is-about').css('div > p::text').extract_first().strip() == 'O marce':
-            item['opis_marki'] = response.css('.c-grid_row.is-about').css('div > p::text').extract()[-1]
-            item['zdjecie_marki'] = "https://ccc.eu{0}".format(
-                response.css('div .c-content > div .widget.image_widget > a > img::attr(src)').extract()
-            )
-        else:
-            item['opis_marki'] = ''
-            item['zdjecie_marki'] = ''
+        item['opis_marki'] = ''
+        item['zdjecie_marki'] = ''
+        hint = response.css('.c-grid_row.is-about').css('div > p::text').extract()
+        if hint != []:
+            hint = hint[0]
+            if hint.strip() == 'O marce':
+                item['opis_marki'] = response.css('.c-grid_row.is-about').css('div > p::text').extract()[-1]
+                item['zdjecie_marki'] = "https://ccc.eu{0}".format(
+                    response.css('div .c-content > div .widget.image_widget > a > img::attr(src)').extract_first()
+                )
         ilosc_rozmiarow = random.randint(2,5)
         rozmiaryT = [37,38,39,40,41,42]
         rozmiary = []
@@ -129,10 +131,12 @@ class ObowieSpider(CrawlSpider):
     def parse_item(self, response):
         # ROZMIARY
         #boxes = response.xpath('//div[@class="c-offerBox is-hovered"]')
-        item_links = response.xpath('//div[@class="c-offerBox_inner"]/div[@class="c-offerBox_photo"]/a/@href').extract()
+        item_links = response.xpath('//div[@class="c-offerBox is-hovered"]/div[@class="c-offerBox_inner"]/div[@class="c-offerBox_photo"]/a/@href').extract()
         for a in item_links:
             #item_link = a.xpath('//div[@class="c-offerBox_inner"]/div[@class="c-offerBox_photo"]/a/@href').extract()
             #ROZMIARY = a.xpath('//div[@class="c-offerBox is-hovered"]/div/div/div[@class="c-offerBox_variantsContent"]').xpath('//div/a[@data-offer-id]/text()').extract()
             #print(ROZMIARY)
             #print('-----------------------------------------------------------------------')
             yield scrapy.Request('https://ccc.eu/' + a, callback=self.parse_detail_page)
+            #pass
+        #pass
