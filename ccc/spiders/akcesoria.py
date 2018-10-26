@@ -28,7 +28,7 @@ class ObowieSpider(CrawlSpider):
     rules = (
         Rule(LinkExtractor(allow=(), restrict_css=('.is-next',)),
              callback="parse_item",
-             follow=False),)
+             follow=True),)
 
     def parse_category(self, url):
         urlT = url.split('/')
@@ -70,8 +70,43 @@ class ObowieSpider(CrawlSpider):
         item['cena'] = cenaT[0] + '.' + cenaT[1]
         item['ilosc'] = random.randint(10, 100)
         item['wyswietlany'] = 1
-        item['marka'] = response.xpath('//table[@class="c-table is-specification"]/tbody/tr/td/span/text()').extract()[1].strip()
+        item['marka'] = response.xpath('//table[@class="c-table is-specification"]/tbody/tr/td/span/text()').extract()[
+            1].strip()
+        if response.xpath('//table[@class="c-table is-specification"]/tbody/tr/td/span/text()').extract()[
+            0].strip() == 'Marka':
+            item['marka'] = \
+            response.xpath('//table[@class="c-table is-specification"]/tbody/tr/td/span/text()').extract()[
+                1].strip()
+        else:
+            item['marka'] = \
+            response.xpath('//table[@class="c-table is-specification"]/tbody/tr/td/span/text()').extract()[
+                3].strip()
+        # zdjecie_marki_path = response.xpath('//div[@class="widget image_widget"]/a/img[@alt="{0}"]/@src'.format(item['marka'])).extract()
+        # if zdjecie_marki_path == []:
+        #     item['zdjecie_marki'] = ''
+        #     item['opis_marki'] = ''
+        # else:
+        #     item['opis_marki'] = response.xpath('//div[@class="widget text_editor clearfix2"]/p/text()').extract_first()
+        #     item['zdjecie_marki'] = "https://ccc.eu{0}".format(zdjecie_marki_path)
         item['opis_marki'] = ''
+        item['zdjecie_marki'] = ''
+        hint = response.css('.c-grid_row.is-about').css('div > p::text').extract()
+        if hint != []:
+            hint = hint[0]
+            if hint.strip() == 'O marce':
+                item['opis_marki'] = response.css('.c-grid_row.is-about').css('div > p::text').extract()[-1]
+                item['zdjecie_marki'] = "https://ccc.eu{0}".format(
+                    response.css('div .c-content > div .widget.image_widget > a > img::attr(src)').extract_first()
+                )
+        ilosc_rozmiarow = random.randint(2, 5)
+        rozmiaryT = [37, 38, 39, 40, 41, 42]
+        rozmiary = []
+        for a in range(ilosc_rozmiarow):
+            rozmiar = random.choice(rozmiaryT)
+            rozmiaryT.remove(rozmiar)
+            rozmiary += [rozmiar]
+        rozmiary = [str(r) for r in rozmiary]
+        item['rozmiary'] = ','.join(rozmiary)
         cechyTrResponses = response.css('.c-table.is-specification').css('tr')
         cechyT = []
         for tr in cechyTrResponses:
@@ -84,16 +119,21 @@ class ObowieSpider(CrawlSpider):
             cechyT += [(first + ':' + second)]
             if first == "Kod produktu":
                 item['indeks'] = second
-        #cechy = ';'.join(cechyT)
+        # cechy = ';'.join(cechyT)
         item['cechy'] = ';'.join(cechyT)
-        #item['indeks'] = #response.css('.c-table.is-specification').css('tr').css('td').css('span::text').extract()[5].strip()
-        #print(cechy)
+        # item['indeks'] = #response.css('.c-table.is-specification').css('tr').css('td').css('span::text').extract()[5].strip()
+        # print(cechy)
         yield item
-        #pass
+        # pass
 
     def parse_item(self, response):
-        #item_links = response.css('.c-layout_col > .c-offerBox_photo a::attr(href)').extract()
-        item_links = response.css('.c-grid').xpath(
+        item_links = response.xpath(
             '//div[@class="c-offerBox is-hovered"]/div[@class="c-offerBox_inner"]/div[@class="c-offerBox_photo"]/a/@href').extract()
         for a in item_links:
+            # item_link = a.xpath('//div[@class="c-offerBox_inner"]/div[@class="c-offerBox_photo"]/a/@href').extract()
+            # ROZMIARY = a.xpath('//div[@class="c-offerBox is-hovered"]/div/div/div[@class="c-offerBox_variantsContent"]').xpath('//div/a[@data-offer-id]/text()').extract()
+            # print(ROZMIARY)
+            # print('-----------------------------------------------------------------------')
             yield scrapy.Request('https://ccc.eu/' + a, callback=self.parse_detail_page)
+            # pass
+        #pass
