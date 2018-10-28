@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import re
+
 import scrapy
 from scrapy.spiders import CrawlSpider, Rule
 from scrapy.linkextractors import LinkExtractor
@@ -9,9 +11,9 @@ import random
 
 class ObowieSpider(CrawlSpider):
     name = "obowie"
-    allowed_domains = ["ccc.eu"]    #www.ccc.eu/pl
+    allowed_domains = ["ccc.eu"]  # www.ccc.eu/pl
     start_urls = [
-        #damskie
+        # damskie
         "https://ccc.eu/pl/damskie/buty/botki",
         "https://ccc.eu/pl/damskie/buty/trzewiki",
         "https://ccc.eu/pl/damskie/buty/kozaki",
@@ -50,9 +52,14 @@ class ObowieSpider(CrawlSpider):
     ]
 
     rules = (
-        Rule(LinkExtractor(allow=(), restrict_css=(".is-next",)),
+        Rule(LinkExtractor(allow=(), restrict_css=(".is-next",)),            #deny='(page=[3-9]|[1-9][0-9])$'
              callback="parse_item",
              follow=True),)
+
+    # rules = (
+    #     Rule(LinkExtractor(allow=(), deny='(page=[4-9]|[1-9][0-9])$', restrict_xpaths=('//a[contains(@href, "page=2")]', '//a[contains(@href, "page=3")]',)),
+    #          callback="parse_item",
+    #          follow=True),)
 
     def parse_category(self, url):
         urlT = url.split("/")
@@ -67,29 +74,55 @@ class ObowieSpider(CrawlSpider):
             kategoria = "g-" + kategoria.title()
         elif "dzieciece" in urlT:
             kategoria = "k-" + kategoria.title()
-        return(kategoria)
+        return (kategoria)
 
+    def get_rozmiary1(self, response):
+        item = response.meta['itemB']
+        fixed_url = response.meta['fixed_url']
+        rozmiary = response.xpath(
+            '//div[@class="c-offerBox_hover"]/div/div[@class="c-offerBox_variantsContent"]/a[contains(@href, "' + fixed_url + '")]/text()').extract()
+        rozmiary = [r.strip() for r in rozmiary]
 
-    ROZMIARY = []
+        if not rozmiary:
+            podkategoriaURL = response.url
+            podkategoriaURL = podkategoriaURL + "?page=2"
+            print('+++++++++++++going to page2 ' + podkategoriaURL)
+            req = scrapy.Request(podkategoriaURL, callback=self.get_rozmiary2, dont_filter=True)
+            req.meta['itemB'] = item
+            req.meta['fixed_url'] = fixed_url
+            print('**********************************fixed_url: ' + fixed_url)
+            return req
+        else:
+            item['rozmiary'] = set(rozmiary)
+            return item
+
+    def get_rozmiary2(self, response):
+        item = response.meta['itemB']
+        fixed_url = response.meta['fixed_url']
+        rozmiary = response.xpath(
+            '//div[@class="c-offerBox_hover"]/div/div[@class="c-offerBox_variantsContent"]/a[contains(@href, "' + fixed_url + '")]/text()').extract()
+        rozmiary = [r.strip() for r in rozmiary]
+        item['rozmiary'] = set(rozmiary)
+        return item
+
     def parse_detail_page(self, response):
+        #print("+++++++++++crawling: " + response.url)
         item = CccItem()
         cenaT = response.css(".c-offerBox_col").css(".a-price span::text").extract()
         zdjeciaT = response.xpath('//div[@data-component="magnifier"]/img/@data-src').extract()
         zdjeciaT = ["https://ccc.eu{0}".format(zdjecie) for zdjecie in zdjeciaT]
         item["zdjecia"] = ';'.join(zdjeciaT)
-        item['nazwa'] = response.css('.c-offerBox_data > .a-typo::text').extract()[0].strip()
+        nazwa = response.css('.c-offerBox_data > .a-typo::text').extract()[0].strip()
+        #print(nazwa)
+        item['nazwa'] = nazwa
         item['kategoria'] = self.parse_category(response.url)
         item['cena'] = cenaT[0] + '.' + cenaT[1]
         item['ilosc'] = random.randint(10, 100)
         item['wyswietlany'] = 1
-        item['marka'] = response.xpath('//table[@class="c-table is-specification"]/tbody/tr/td/span/text()').extract()[1].strip()
-        # zdjecie_marki_path = response.xpath('//div[@class="widget image_widget"]/a/img[@alt="{0}"]/@src'.format(item['marka'])).extract()
-        # if zdjecie_marki_path == []:
-        #     item['zdjecie_marki'] = ''
-        #     item['opis_marki'] = ''
-        # else:
-        #     item['opis_marki'] = response.xpath('//div[@class="widget text_editor clearfix2"]/p/text()').extract_first()
-        #     item['zdjecie_marki'] = "https://ccc.eu{0}".format(zdjecie_marki_path)
+
+        # marka + opis i zdjęcie
+        item['marka'] = response.xpath('//table[@class="c-table is-specification"]/tbody/tr/td/span/text()').extract()[
+            1].strip()
         item['opis_marki'] = ''
         item['zdjecie_marki'] = ''
         hint = response.css('.c-grid_row.is-about').css('div > p::text').extract()
@@ -100,15 +133,8 @@ class ObowieSpider(CrawlSpider):
                 item['zdjecie_marki'] = "https://ccc.eu{0}".format(
                     response.css('div .c-content > div .widget.image_widget > a > img::attr(src)').extract_first()
                 )
-        ilosc_rozmiarow = random.randint(2,5)
-        rozmiaryT = [37,38,39,40,41,42]
-        rozmiary = []
-        for a in range(ilosc_rozmiarow):
-            rozmiar = random.choice(rozmiaryT)
-            rozmiaryT.remove(rozmiar)
-            rozmiary += [rozmiar]
-        rozmiary = [str(r) for r in rozmiary]
-        item['rozmiary'] = ','.join(rozmiary)
+
+        # cechy
         cechyTrResponses = response.css('.c-table.is-specification').css('tr')
         cechyT = []
         for tr in cechyTrResponses:
@@ -121,22 +147,54 @@ class ObowieSpider(CrawlSpider):
             cechyT += [(first + ':' + second)]
             if first == "Kod produktu":
                 item['indeks'] = second
-        #cechy = ';'.join(cechyT)
         item['cechy'] = ';'.join(cechyT)
-        #item['indeks'] = #response.css('.c-table.is-specification').css('tr').css('td').css('span::text').extract()[5].strip()
-        #print(cechy)
+
+        # -------stare rozmiary--------
+        ilosc_rozmiarow = random.randint(2, 6)
+        rozmiaryF = [32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42]
+        rozmiaryM = [36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46]
+        rozmiaryK = [20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34]
+        kat = response.url
+        kat = kat.split('/')[-4]
+        rozmiaryT = []
+        if kat == 'damskie':
+            rozmiaryT = rozmiaryF
+        elif kat == 'meskie':
+            rozmiaryT = rozmiaryM
+        else:
+            rozmiaryT = rozmiaryK
+        rozmiary = []
+        for a in range(ilosc_rozmiarow):
+            rozmiar = random.choice(rozmiaryT)
+            rozmiaryT.remove(rozmiar)
+            rozmiary += [rozmiar]
+        rozmiary = [str(r) for r in rozmiary]
+        item['rozmiary'] = ','.join(rozmiary)
         yield item
-        #pass
+
+        # rozmiary
+        # rozmiaryT = []
+        # podkategoriaURL = response.url
+        # while podkategoriaURL[-1] != '/':
+        #     podkategoriaURL = podkategoriaURL[:-1]
+        # podkategoriaURL = podkategoriaURL[:-1]
+        #
+        # fixed_url = response.url
+        # # fixed_url = fixed_url[18:]            #re.sub('\https://ccc.eu/$', '', fixed_url)  # new_url = url[:url.rfind(".")]
+        # fixed_url = fixed_url.split('/')[-1]
+        # fixed_url = fixed_url.split('-')[:-1]
+        # fixed_url = '-'.join(fixed_url)
+        #
+        # req = scrapy.Request(podkategoriaURL, callback=self.get_rozmiary1, dont_filter=True)
+        # req.meta['itemB'] = item
+        # req.meta['fixed_url'] = fixed_url
+        # return req
 
     def parse_item(self, response):
-        # ROZMIARY
-        #boxes = response.xpath('//div[@class="c-offerBox is-hovered"]')
-        item_links = response.xpath('//div[@class="c-offerBox is-hovered"]/div[@class="c-offerBox_inner"]/div[@class="c-offerBox_photo"]/a/@href').extract()
+        #print(response.url)
+        item_links = response.xpath(
+            '//div[@class="c-offerBox is-hovered"]/div[@class="c-offerBox_inner"]/div['
+            '@class="c-offerBox_photo"]/a/@href').extract()
         for a in item_links:
-            #item_link = a.xpath('//div[@class="c-offerBox_inner"]/div[@class="c-offerBox_photo"]/a/@href').extract()
-            #ROZMIARY = a.xpath('//div[@class="c-offerBox is-hovered"]/div/div/div[@class="c-offerBox_variantsContent"]').xpath('//div/a[@data-offer-id]/text()').extract()
-            #print(ROZMIARY)
-            #print('-----------------------------------------------------------------------')
+            print(a)
             yield scrapy.Request('https://ccc.eu/' + a, callback=self.parse_detail_page)
-            #pass
-        #pass
