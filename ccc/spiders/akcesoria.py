@@ -34,15 +34,10 @@ class ObowieSpider(CrawlSpider):
         urlT = url.split('/')
         kategoria = urlT[-2]
         if 'damskie' in urlT:
-            kategoria = 'f-' + kategoria.title()
-        elif 'meskie' in urlT:
-            kategoria = 'm-' + kategoria.title()
-        elif 'chlopiece' in urlT:
-            kategoria = 'b-' + kategoria.title()
-        elif 'dziewczece' in urlT:
-            kategoria = 'g-' + kategoria.title()
-        elif 'dzieciece' in urlT:
-            kategoria = 'k-' + kategoria.title()
+            kategoria1 = 'f-' + kategoria.title()
+            kategoria2 = 'm-' + kategoria.title()
+            kategoria3 = 'k-' + kategoria.title()
+            kategoria = ';'.join([kategoria1, kategoria2, kategoria3])
         return(kategoria)
 
     # def parse_detail_page(self, response):

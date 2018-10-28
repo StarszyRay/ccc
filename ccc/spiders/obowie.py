@@ -113,6 +113,7 @@ class ObowieSpider(CrawlSpider):
         zdjeciaT = ["https://ccc.eu{0}".format(zdjecie) for zdjecie in zdjeciaT]
         item["zdjecia"] = ';'.join(zdjeciaT)
         nazwa = response.css('.c-offerBox_data > .a-typo::text').extract()[0].strip()
+        nazwa.replace('&amp;', ' & ')
         #print(nazwa)
         item['nazwa'] = nazwa
         item['kategoria'] = self.parse_category(response.url)
