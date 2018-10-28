@@ -130,9 +130,9 @@ class ObowieSpider(CrawlSpider):
             hint = hint[0]
             if hint.strip() == 'O marce':
                 item['opis_marki'] = response.css('.c-grid_row.is-about').css('div > p::text').extract()[-1]
-                item['zdjecie_marki'] = "https://ccc.eu{0}".format(
-                    response.css('div .c-content > div .widget.image_widget > a > img::attr(src)').extract_first()
-                )
+                link_zdj = response.css('div .c-content > div .widget.image_widget > a > img::attr(src)').extract_first()
+                if link_zdj is not None:
+                    item['zdjecie_marki'] = "https://ccc.eu{0}".format(link_zdj)
 
         # cechy
         cechyTrResponses = response.css('.c-table.is-specification').css('tr')

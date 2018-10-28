@@ -65,7 +65,10 @@ class ObowieSpider(CrawlSpider):
         zdjeciaT = response.xpath('//div[@data-component="magnifier"]/img/@data-src').extract()
         zdjeciaT = ["https://ccc.eu{0}".format(zdjecie) for zdjecie in zdjeciaT]
         item["zdjecia"] = ';'.join(zdjeciaT)
-        item['nazwa'] = response.css('.c-offerBox_data > .a-typo::text').extract()[0].strip()
+        nazwa = response.css('.c-offerBox_data > .a-typo::text').extract()[0].strip()
+        nazwa = nazwa.replace('&amp;', ',')
+        nazwa = nazwa.replace(';', ',')
+        item['nazwa'] = nazwa
         item['kategoria'] = self.parse_category(response.url)
         item['cena'] = cenaT[0] + '.' + cenaT[1]
         item['ilosc'] = random.randint(10, 100)
