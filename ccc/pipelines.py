@@ -29,11 +29,33 @@ class CccPipeline(object):
         pass
 
     def process_item(self, item, spider):
+
+        if item['rozmiary'] == set():
+            ilosc_rozmiarow = random.randint(2, 6)
+            rozmiaryF = [32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42]
+            rozmiaryM = [36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46]
+            rozmiaryK = [20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34]
+            kat = item['kategoria']
+            rozmiaryT = []
+            if kat == 'f':
+                rozmiaryT = rozmiaryF
+            elif kat == 'm':
+                rozmiaryT = rozmiaryM
+            else:
+                rozmiaryT = rozmiaryK
+            rozmiary = []
+            for a in range(ilosc_rozmiarow):
+                rozmiar = random.choice(rozmiaryT)
+                rozmiaryT.remove(rozmiar)
+                rozmiary += [rozmiar]
+            rozmiary = [str(r) for r in rozmiary]
+            item['rozmiary'] = set(rozmiary)
+            #print('^^^^^^^^^^^^^^^parser:' + item['rozmiary'])
+
         self.markiT.append((item['marka'], item['opis_marki'], item['zdjecie_marki'], item['wyswietlany']))
         if spider.name == 'obowie':
             for rozmiar in item['rozmiary']:        #item['rozmiary']).split(','):
-                if rozmiar.contains('/'):
-                    pass
-                else:
-                    self.csv_kombinacje_writer.writerow([ item['indeks'], "Size:select:0", "{0}:00:00".format(rozmiar), random.randint(10, 100)])
+                if '/' not in rozmiar:
+                    self.csv_kombinacje_writer.writerow(
+                        [item['indeks'], "Size:select:0", "{0}:00:00".format(rozmiar), random.randint(10, 100)])
         return item
