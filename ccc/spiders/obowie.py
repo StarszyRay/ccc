@@ -51,15 +51,15 @@ class ObowieSpider(CrawlSpider):
         "https://ccc.eu/pl/dzieciece/chlopiece/kapcie"
     ]
 
-    rules = (
-        Rule(LinkExtractor(allow=(), restrict_css=(".is-next",)),            #deny='(page=[3-9]|[1-9][0-9])$'
-             callback="parse_item",
-             follow=True),)
-
     # rules = (
-    #     Rule(LinkExtractor(allow=(), deny='(page=[4-9]|[1-9][0-9])$', restrict_xpaths=('//a[contains(@href, "page=2")]', '//a[contains(@href, "page=3")]',)),
+    #     Rule(LinkExtractor(allow=(), restrict_css=(".is-next",)),            #deny='(page=[3-9]|[1-9][0-9])$'
     #          callback="parse_item",
     #          follow=True),)
+
+    rules = (
+        Rule(LinkExtractor(allow=(), restrict_xpaths=('//a[contains(@href, "page=2")]',)),
+             callback="parse_start_url",
+             follow=True),)
 
     def parse_category(self, url):
         urlT = url.split("/")
@@ -150,52 +150,51 @@ class ObowieSpider(CrawlSpider):
                 item['indeks'] = second
         item['cechy'] = ';'.join(cechyT)
 
-        # -------stare rozmiary--------
-        ilosc_rozmiarow = random.randint(2, 6)
-        rozmiaryF = [32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42]
-        rozmiaryM = [36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46]
-        rozmiaryK = [20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34]
-        kat = response.url
-        kat = kat.split('/')[-4]
-        rozmiaryT = []
-        if kat == 'damskie':
-            rozmiaryT = rozmiaryF
-        elif kat == 'meskie':
-            rozmiaryT = rozmiaryM
-        else:
-            rozmiaryT = rozmiaryK
-        rozmiary = []
-        for a in range(ilosc_rozmiarow):
-            rozmiar = random.choice(rozmiaryT)
-            rozmiaryT.remove(rozmiar)
-            rozmiary += [rozmiar]
-        rozmiary = [str(r) for r in rozmiary]
-        item['rozmiary'] = ','.join(rozmiary)
-        yield item
+        # # -------stare rozmiary--------
+        # ilosc_rozmiarow = random.randint(2, 6)
+        # rozmiaryF = [32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42]
+        # rozmiaryM = [36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46]
+        # rozmiaryK = [20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34]
+        # kat = response.url
+        # kat = kat.split('/')[-4]
+        # rozmiaryT = []
+        # if kat == 'damskie':
+        #     rozmiaryT = rozmiaryF
+        # elif kat == 'meskie':
+        #     rozmiaryT = rozmiaryM
+        # else:
+        #     rozmiaryT = rozmiaryK
+        # rozmiary = []
+        # for a in range(ilosc_rozmiarow):
+        #     rozmiar = random.choice(rozmiaryT)
+        #     rozmiaryT.remove(rozmiar)
+        #     rozmiary += [rozmiar]
+        # rozmiary = [str(r) for r in rozmiary]
+        # item['rozmiary'] = ','.join(rozmiary)
+        # yield item
 
         # rozmiary
-        # rozmiaryT = []
-        # podkategoriaURL = response.url
-        # while podkategoriaURL[-1] != '/':
-        #     podkategoriaURL = podkategoriaURL[:-1]
-        # podkategoriaURL = podkategoriaURL[:-1]
-        #
-        # fixed_url = response.url
-        # # fixed_url = fixed_url[18:]            #re.sub('\https://ccc.eu/$', '', fixed_url)  # new_url = url[:url.rfind(".")]
-        # fixed_url = fixed_url.split('/')[-1]
-        # fixed_url = fixed_url.split('-')[:-1]
-        # fixed_url = '-'.join(fixed_url)
-        #
-        # req = scrapy.Request(podkategoriaURL, callback=self.get_rozmiary1, dont_filter=True)
-        # req.meta['itemB'] = item
-        # req.meta['fixed_url'] = fixed_url
-        # return req
+        podkategoriaURL = response.url
+        while podkategoriaURL[-1] != '/':
+            podkategoriaURL = podkategoriaURL[:-1]
+        podkategoriaURL = podkategoriaURL[:-1]
 
-    def parse_item(self, response):
+        fixed_url = response.url
+        # fixed_url = fixed_url[18:]            #re.sub('\https://ccc.eu/$', '', fixed_url)  # new_url = url[:url.rfind(".")]
+        fixed_url = fixed_url.split('/')[-1]
+        fixed_url = fixed_url.split('-')[:-1]
+        fixed_url = '-'.join(fixed_url)
+
+        req = scrapy.Request(podkategoriaURL, callback=self.get_rozmiary1, dont_filter=True)
+        req.meta['itemB'] = item
+        req.meta['fixed_url'] = fixed_url
+        return req
+
+    def parse_start_url(self, response):
         #print(response.url)
         item_links = response.xpath(
             '//div[@class="c-offerBox is-hovered"]/div[@class="c-offerBox_inner"]/div['
             '@class="c-offerBox_photo"]/a/@href').extract()
         for a in item_links:
-            print(a)
-            yield scrapy.Request('https://ccc.eu/' + a, callback=self.parse_detail_page)
+            #print(a)
+            yield scrapy.Request('https://ccc.eu/' + a, callback=self.parse_detail_page, dont_filter=True)

@@ -26,8 +26,8 @@ class ObowieSpider(CrawlSpider):
     ]
 
     rules = (
-        Rule(LinkExtractor(allow=(), restrict_css=('.is-next',)),
-             callback="parse_item",
+        Rule(LinkExtractor(allow=(), restrict_xpaths=('//a[contains(@href, "page=2")]',)),
+             callback="parse_start_url",
              follow=True),)
 
     def parse_category(self, url):
@@ -124,7 +124,8 @@ class ObowieSpider(CrawlSpider):
         yield item
         # pass
 
-    def parse_item(self, response):
+    def parse_start_url(self, response):
+        #print(response.url)
         item_links = response.xpath(
             '//div[@class="c-offerBox is-hovered"]/div[@class="c-offerBox_inner"]/div[@class="c-offerBox_photo"]/a/@href').extract()
         for a in item_links:
@@ -134,4 +135,4 @@ class ObowieSpider(CrawlSpider):
             # print('-----------------------------------------------------------------------')
             yield scrapy.Request('https://ccc.eu/' + a, callback=self.parse_detail_page)
             # pass
-        #pass
+        pass

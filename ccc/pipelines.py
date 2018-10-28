@@ -31,6 +31,9 @@ class CccPipeline(object):
     def process_item(self, item, spider):
         self.markiT.append((item['marka'], item['opis_marki'], item['zdjecie_marki'], item['wyswietlany']))
         if spider.name == 'obowie':
-            for rozmiar in (item['rozmiary']).split(','):
-                self.csv_kombinacje_writer.writerow([ item['indeks'], "Size:select:0", "{0}:00:00".format(rozmiar), random.randint(10, 100)])
+            for rozmiar in item['rozmiary']:        #item['rozmiary']).split(','):
+                if rozmiar.contains('/'):
+                    pass
+                else:
+                    self.csv_kombinacje_writer.writerow([ item['indeks'], "Size:select:0", "{0}:00:00".format(rozmiar), random.randint(10, 100)])
         return item

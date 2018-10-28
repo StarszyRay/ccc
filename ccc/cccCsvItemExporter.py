@@ -13,4 +13,4 @@ class CccCsvItemExporter(CsvItemExporter):
 
         super(CccCsvItemExporter, self).__init__(*args, **kwargs)
 
-        self.stream.newline = ""
+        self.stream.newline=""
