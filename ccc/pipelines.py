@@ -12,7 +12,6 @@ class CccPipeline(object):
     def open_spider(self, spider):
         self.csv_marki_writer = csv.writer(open('marki_{0}.csv'.format(spider.name), 'w', encoding='utf-8', newline=''), delimiter='|')
         self.csv_marki_writer.writerow(['marka', 'opis_marki', 'zdjecie_marki', 'aktywny'])
-        #Index	Attribute(Name:Type:Pos)	Value(Value:Pos)	Count
         if spider.name == 'obowie':
             self.csv_kombinacje_writer = csv.writer(open('kombinacje_{0}.csv'.format(spider.name), 'w', encoding='utf-8', newline=''),
                                                delimiter='|')
@@ -50,12 +49,11 @@ class CccPipeline(object):
                 rozmiary += [rozmiar]
             rozmiary = [str(r) for r in rozmiary]
             item['rozmiary'] = set(rozmiary)
-            #print('^^^^^^^^^^^^^^^parser:' + item['rozmiary'])
 
         self.markiT.append((item['marka'], item['opis_marki'], item['zdjecie_marki'], item['wyswietlany']))
         if spider.name == 'obowie':
-            for rozmiar in item['rozmiary']:        #item['rozmiary']).split(','):
+            for rozmiar in item['rozmiary']:
                 if '/' not in rozmiar:
                     self.csv_kombinacje_writer.writerow(
-                        [item['indeks'], "Size:select:0", "{0}:00:00".format(rozmiar), random.randint(10, 100)])
+                        [item['indeks'], "Rozmiar:select:0", "{0}:0".format(rozmiar), random.randint(10, 100)])
         return item
